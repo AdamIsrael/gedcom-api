@@ -1,0 +1,14 @@
+server:
+    hostname: "localhost"
+    port: "8000"
+
+    # The read/write timeout, in seconds
+    readtimeout: 15
+    writetimeout: 15
+
+gedcom:
+    # The path where we'll store the uploaded gedcom files
+    path: "/opt/gedcom/"
+
+    # Max upload file size
+    maxfilesize: 20

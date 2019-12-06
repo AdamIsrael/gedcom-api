@@ -9,12 +9,13 @@ import (
 	"path"
 	"strconv"
 
-	. "github.com/adamisrael/gedcom-api/internal/utils"
+	"github.com/adamisrael/gedcom-api/internal/utils"
 
 	"github.com/adamisrael/gedcom"
 	"github.com/gorilla/mux"
 )
 
+// Individual is the structure to use for the JSON output
 type Individual struct {
 	Xref     string
 	Name     string
@@ -24,20 +25,45 @@ type Individual struct {
 	Siblings []string
 }
 
+// AllIndividualHandler handles requests for all Individual records
+func AllIndividualHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	// w.Write(json)
+	fmt.Fprintln(w, "{}")
+}
+
 // IndividualHandler handles requests for Individual records
 func IndividualHandler(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
+	// Get the GEDCOM id
 	gedcomid := params["gedcomid"]
+
+	// Get the Individual ID
+	var individualid int
+	var err error
+
+	individualid, err = strconv.Atoi(params["id"])
+	if utils.CheckErr(err) {
+		fmt.Printf("ID \"%s\" is not a valid integer", params["id"])
+		return
+	}
+
+	// If no individual id is zero, pass this to the AllIndividualHandler
+	if individualid == 0 {
+		AllIndividualHandler(w, r)
+		return
+	}
 
 	if len(gedcomid) == 0 {
 		io.WriteString(w, `{"error": "Invalid Gedcom ID"}`)
 	} else {
 
-		config := GetConfig()
+		config := utils.GetConfig()
 
 		filename := path.Join(config.Gedcom.Path, gedcomid+".ged")
-		if !FileExists(filename) {
+		if !utils.FileExists(filename) {
 			fmt.Fprintln(w, `{status: "Invalid GEDCOM"}`)
 			return
 		}
@@ -50,16 +76,10 @@ func IndividualHandler(w http.ResponseWriter, r *http.Request) {
 		// TODO: Figure out a better way of finding an individual by id
 		for _, i := range g.Individual {
 
-			individualID, err := strconv.Atoi(params["id"])
-			if CheckErr(err) {
-				fmt.Printf("ID \"%s\" is not a valid integer", params["id"])
-				return
-			}
-
 			// TODO: Return the matching individual
-			fmt.Printf("Looking for Individual P%d\n", individualID)
+			// fmt.Printf("Looking for Individual P%d\n", individualid)
 
-			if i.Xref == fmt.Sprintf("P%d", individualID) {
+			if i.Xref == fmt.Sprintf("P%d", individualid) {
 				individual.Xref = i.Xref
 				individual.Name = i.Name[0].Name
 				individual.Family = i.Parents[0].Family.Xref
@@ -73,7 +93,7 @@ func IndividualHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 				individualJSON, err := json.Marshal(individual)
-				CheckErr(err)
+				utils.CheckErr(err)
 
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusOK)

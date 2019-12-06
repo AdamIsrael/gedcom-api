@@ -4,10 +4,8 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 
 	"github.com/adamisrael/gedcom-api/internal/config"
-	"github.com/google/uuid"
 	"github.com/spf13/viper"
 )
 
@@ -31,19 +29,6 @@ func GetConfig() config.Configuration {
 	// 	fmt.Println("Config file changed:", e.Name)
 	// })
 	return configuration
-}
-
-// GetGedcomFilename returns the path to use to store an uploaded GEDCOM file
-func GetGedcomFilename() (string, string) {
-	id, err := uuid.NewUUID()
-	CheckErr(err)
-
-	config := GetConfig()
-	filename := path.Join(config.Gedcom.Path, id.String()+".ged")
-	if FileExists(filename) {
-		return GetGedcomFilename()
-	}
-	return id.String(), filename
 }
 
 // FileExists checks to see if the filename exists

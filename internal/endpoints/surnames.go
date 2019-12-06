@@ -7,7 +7,7 @@ import (
 	"path"
 	"strings"
 
-	. "github.com/adamisrael/gedcom-api/internal/utils"
+	"github.com/adamisrael/gedcom-api/internal/utils"
 
 	"github.com/adamisrael/gedcom"
 	"github.com/gorilla/mux"
@@ -28,10 +28,10 @@ func SurnameHandler(w http.ResponseWriter, r *http.Request) {
 		io.WriteString(w, `{"error": "Invalid Gedcom ID"}`)
 	} else {
 
-		config := GetConfig()
+		config := utils.GetConfig()
 
 		filename := path.Join(config.Gedcom.Path, gedcomid+".ged")
-		if !FileExists(filename) {
+		if !utils.FileExists(filename) {
 			io.WriteString(w, `{"error": "Gedcom not found."}`)
 			return
 		}
@@ -51,7 +51,7 @@ func SurnameHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		surnamesJSON, err := json.Marshal(surnames)
-		CheckErr(err)
+		utils.CheckErr(err)
 
 		w.Write(surnamesJSON)
 		// io.WriteString(w, `{"alive": true}`)

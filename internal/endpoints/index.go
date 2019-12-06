@@ -5,14 +5,14 @@ import (
 	"net/http"
 )
 
-type Endpoint struct {
-	Endpoint string
-}
+// type Endpoint struct {
+// 	Endpoint string
+// }
 
-type IndexPageData struct {
-	PageTitle string
-	Endpoints []Endpoint
-}
+// type IndexPageData struct {
+// 	PageTitle string
+// 	Endpoints []Endpoint
+// }
 
 // IndexHandler displays a welcome page and a list of available endpoints
 func IndexHandler(w http.ResponseWriter, r *http.Request) {

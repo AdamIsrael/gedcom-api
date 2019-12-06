@@ -1,0 +1,27 @@
+language: go
+
+# Work around `case-insensitive import collision` because of mixed-case of
+# my github user name. All imports use the lowercase version, but travis-ci
+# tries to run against the ProperCase version and fails.
+go_import_path: github.com/adamisrael/gedcom-api
+
+go:
+    - 1.13
+    - tip
+
+matrix:
+    allow_failures:
+        - go: tip
+          fast_finish: true
+
+before_script:
+  - GO_FILES=$(find . -iname '*.go' | grep -v /vendor/)
+  - PKGS=$(go list ./... | grep -v /vendor/)
+
+script:
+  - test -z $(gofmt -s -l $GO_FILES)
+  - go test -v -race -coverprofile=coverage.txt -covermode=atomic $PKGS
+  - go vet $PKGS
+
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
